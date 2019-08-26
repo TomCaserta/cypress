@@ -428,7 +428,7 @@ const isAttached = function ($el) {
   // is technically bound to a differnet document
   // but c'mon
   const isIn = (el) => {
-    return $.contains(doc, el)
+    return contains(doc, el)
   }
 
   // make sure the document is currently
@@ -436,6 +436,32 @@ const isAttached = function ($el) {
   // make sure every single element
   // is attached to this document
   return $document.hasActiveWindow(doc) && _.every(els, isIn)
+}
+
+const contains = function (parentElement, childElement) {
+  if (childElement) {
+    while ((childElement = getParentOrShadowHost(childElement))) {
+      if (childElement === parentElement) {
+        return true
+      }
+    }
+  }
+
+  return false
+}
+
+const getParentOrShadowHost = function (elem) {
+  const parent = elem.parentNode
+
+  if (!parent) {
+    return
+  }
+
+  if (parent.nodeType === window.Node.DOCUMENT_FRAGMENT_NODE && parent.host) {
+    return parent.host
+  }
+
+  return parent
 }
 
 const isSame = function ($el1, $el2) {
@@ -628,7 +654,7 @@ const getFirstFixedOrStickyPositionParent = ($el) => {
   }
 
   // else recursively continue to walk up the parent node chain
-  return getFirstFixedOrStickyPositionParent($el.parent())
+  return getFirstFixedOrStickyPositionParent(getParentOrShadowHost($el))
 }
 
 const getFirstStickyPositionParent = ($el) => {
@@ -875,6 +901,8 @@ module.exports = {
   findParent,
 
   getElements,
+
+  getParentOrShadowHost,
 
   getFirstFocusableEl,
 

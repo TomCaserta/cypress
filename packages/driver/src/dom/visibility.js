@@ -13,6 +13,17 @@ const isVisible = (el) => {
   return !isHidden(el, 'isVisible()')
 }
 
+const getParent = (el) => {
+  const elements = $jquery.unwrap(el)
+  const element = Array.isArray(elements) ? elements[0] : elements
+
+  if (!element) {
+    return
+  }
+
+  return $jquery.wrap($elements.getParentOrShadowHost(element))
+}
+
 // TODO: we should prob update dom
 // to be passed in $utils as a dependency
 // because of circular references
@@ -212,7 +223,7 @@ const elIsNotElementFromPoint = function ($el) {
   return !$elements.isDescendent($el, $elAtPoint)
 }
 
-const elIsOutOfBoundsOfAncestorsOverflow = function ($el, $ancestor = $el.parent()) {
+const elIsOutOfBoundsOfAncestorsOverflow = function ($el, $ancestor = getParent($el)) {
   // no ancestor, not out of bounds!
   if (!$ancestor) {
     return false
@@ -247,7 +258,7 @@ const elIsOutOfBoundsOfAncestorsOverflow = function ($el, $ancestor = $el.parent
     }
   }
 
-  return elIsOutOfBoundsOfAncestorsOverflow($el, $ancestor.parent())
+  return elIsOutOfBoundsOfAncestorsOverflow($el, getParent($ancestor))
 }
 
 const elIsHiddenByAncestors = function ($el, $origEl = $el) {
@@ -257,13 +268,13 @@ const elIsHiddenByAncestors = function ($el, $origEl = $el) {
   // is effectively hidden
   // -----UNLESS------
   // the parent or a descendent has position: absolute|fixed
-  const $parent = $el.parent()
+  const $parent = getParent($el)
 
   // stop if we've reached the body or html
   // in case there is no body
   // or if parent is the document which can
   // happen if we already have an <html> element
-  if ($parent.is('body,html') || $document.isDocument($parent)) {
+  if ($parent.is('body,html') || $document.isDocument($parent) || $parent.length === 0) {
     return false
   }
 
@@ -289,7 +300,7 @@ const parentHasNoOffsetWidthOrHeightAndOverflowHidden = function ($el) {
   }
 
   // continue walking
-  return parentHasNoOffsetWidthOrHeightAndOverflowHidden($el.parent())
+  return parentHasNoOffsetWidthOrHeightAndOverflowHidden(getParent($el))
 }
 
 const parentHasDisplayNone = function ($el) {
@@ -305,7 +316,7 @@ const parentHasDisplayNone = function ($el) {
   }
 
   // continue walking
-  return parentHasDisplayNone($el.parent())
+  return parentHasDisplayNone(getParent($el))
 }
 
 const parentHasVisibilityHidden = function ($el) {
@@ -320,7 +331,7 @@ const parentHasVisibilityHidden = function ($el) {
   }
 
   // continue walking
-  return parentHasVisibilityHidden($el.parent())
+  return parentHasVisibilityHidden(getParent($el))
 }
 
 const parentHasVisibilityCollapse = function ($el) {
@@ -335,7 +346,7 @@ const parentHasVisibilityCollapse = function ($el) {
   }
 
   // continue walking
-  return parentHasVisibilityCollapse($el.parent())
+  return parentHasVisibilityCollapse(getParent($el))
 }
 
 /* eslint-disable no-cond-assign */
@@ -355,19 +366,19 @@ const getReasonIsHidden = function ($el) {
     return `This element '${node}' is not visible because it has CSS property: 'display: none'`
   }
 
-  if ($parent = parentHasDisplayNone($el.parent())) {
+  if ($parent = parentHasDisplayNone(getParent($el))) {
     parentNode = $elements.stringify($parent, 'short')
 
     return `This element '${node}' is not visible because its parent '${parentNode}' has CSS property: 'display: none'`
   }
 
-  if ($parent = parentHasVisibilityHidden($el.parent())) {
+  if ($parent = parentHasVisibilityHidden(getParent($el))) {
     parentNode = $elements.stringify($parent, 'short')
 
     return `This element '${node}' is not visible because its parent '${parentNode}' has CSS property: 'visibility: hidden'`
   }
 
-  if ($parent = parentHasVisibilityCollapse($el.parent())) {
+  if ($parent = parentHasVisibilityCollapse(getParent($el))) {
     parentNode = $elements.stringify($parent, 'short')
 
     return `This element '${node}' is not visible because its parent '${parentNode}' has CSS property: 'visibility: collapse'`
@@ -385,7 +396,7 @@ const getReasonIsHidden = function ($el) {
     return `This element '${node}' is not visible because it has an effective width and height of: '${width} x ${height}' pixels.`
   }
 
-  if ($parent = parentHasNoOffsetWidthOrHeightAndOverflowHidden($el.parent())) {
+  if ($parent = parentHasNoOffsetWidthOrHeightAndOverflowHidden(getParent($el))) {
     parentNode = $elements.stringify($parent, 'short')
     width = elOffsetWidth($parent)
     height = elOffsetHeight($parent)

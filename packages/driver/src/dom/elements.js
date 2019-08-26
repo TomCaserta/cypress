@@ -451,6 +451,12 @@ const contains = function (parentElement, childElement) {
 }
 
 const getParentOrShadowHost = function (elem) {
+  elem = $jquery.unwrap(elem)
+
+  if (Array.isArray(elem)) {
+    elem = elem[0]
+  }
+
   const parent = elem.parentNode
 
   if (!parent) {
@@ -467,7 +473,7 @@ const getParentOrShadowHost = function (elem) {
 const getParents = function (elem, selector = null, until = null) {
   const parents = []
 
-  while ((elem = getParentOrShadowHost(parent)) && elem !== window.Node.DOCUMENT_NODE) {
+  while ((elem = getParentOrShadowHost(elem)) && elem !== window.Node.DOCUMENT_NODE) {
     const $el = $jquery.wrap(elem)
 
     if (until && $el.is(until)) {
@@ -598,7 +604,7 @@ const isDescendent = ($el1, $el2) => {
     return false
   }
 
-  return !!(($el1.get(0) === $el2.get(0)) || $el1.has($el2).length)
+  return !!(($el1.get(0) === $el2.get(0)) || getParents($el1).index($el2) !== -1)
 }
 
 const findParent = (el, fn) => {
@@ -614,12 +620,12 @@ const findParent = (el, fn) => {
       return retEl
     }
 
-    const nextEl = curEl.parentElement
+    const nextEl = getParentOrShadowHost(curEl)
 
     return recurse(nextEl, curEl)
   }
 
-  return recurse(el.parentElement, el) || el
+  return recurse(getParentOrShadowHost(el), el) || el
 }
 
 // in order to simulate actual user behavior we need to do the following:
@@ -632,7 +638,7 @@ const getFirstFocusableEl = ($el) => {
     return $el
   }
 
-  const parent = $el.parent()
+  const parent = $jquery.wrap(getParentOrShadowHost($el))
 
   // if we have no parent then just return
   // the window since that can receive focus
@@ -642,7 +648,7 @@ const getFirstFocusableEl = ($el) => {
     return $(win)
   }
 
-  return getFirstFocusableEl($el.parent())
+  return getFirstFocusableEl($jquery.wrap(getParentOrShadowHost($el)))
 }
 
 const getFirstParentWithTagName = ($el, tagName) => {
@@ -658,13 +664,13 @@ const getFirstParentWithTagName = ($el, tagName) => {
   }
 
   // else recursively continue to walk up the parent node chain
-  return getFirstParentWithTagName($el.parent(), tagName)
+  return getFirstParentWithTagName($jquery.wrap(getParentOrShadowHost($el)), tagName)
 }
 
 const getFirstFixedOrStickyPositionParent = ($el) => {
   // return null if we're at body/html/document
   // cuz that means nothing has fixed position
-  if (!$el || $el.is('body,html') || $document.isDocument($el)) {
+  if (!$el || $el.is('body,html') || $document.isDocument($el) || $el.length === 0) {
     return null
   }
 
@@ -674,13 +680,13 @@ const getFirstFixedOrStickyPositionParent = ($el) => {
   }
 
   // else recursively continue to walk up the parent node chain
-  return getFirstFixedOrStickyPositionParent(getParentOrShadowHost($el))
+  return getFirstFixedOrStickyPositionParent($jquery.wrap(getParentOrShadowHost($el)))
 }
 
 const getFirstStickyPositionParent = ($el) => {
   // return null if we're at body/html
   // cuz that means nothing has sticky position
-  if (!$el || $el.is('body,html')) {
+  if (!$el || $el.is('body,html') || $el.length === 0) {
     return null
   }
 
@@ -690,7 +696,7 @@ const getFirstStickyPositionParent = ($el) => {
   }
 
   // else recursively continue to walk up the parent node chain
-  return getFirstStickyPositionParent($el.parent())
+  return getFirstStickyPositionParent($jquery.wrap(getParentOrShadowHost($el)))
 }
 
 const getFirstScrollableParent = ($el) => {
@@ -698,7 +704,7 @@ const getFirstScrollableParent = ($el) => {
   // scrollingElement = doc.scrollingElement
 
   const search = ($el) => {
-    const $parent = $el.parent()
+    const $parent = $jquery.wrap(getParentOrShadowHost($el))
 
     // we have no more parents
     if (!($parent || $parent.length)) {
@@ -775,7 +781,7 @@ const getFirstDeepestElement = (elements, index = 0) => {
   }
 
   // does current contain next?
-  if ($.contains($current.get(0), $next.get(0))) {
+  if (contains($current.get(0), $next.get(0))) {
     return getFirstDeepestElement(elements, index + 1)
   }
 

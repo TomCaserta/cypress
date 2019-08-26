@@ -380,7 +380,7 @@ const isScrollOrAuto = (prop) => {
 }
 
 const isAncestor = ($el, $maybeAncestor) => {
-  return $el.parents().index($maybeAncestor) >= 0
+  return getParents($el).index($maybeAncestor) >= 0
 }
 
 const isChild = ($el, $maybeChild) => {
@@ -462,6 +462,26 @@ const getParentOrShadowHost = function (elem) {
   }
 
   return parent
+}
+
+const getParents = function (elem, selector = null, until = null) {
+  const parents = []
+
+  while ((elem = getParentOrShadowHost(parent)) && elem !== window.Node.DOCUMENT_NODE) {
+    const $el = $jquery.wrap(elem)
+
+    if (until && $el.is(until)) {
+      break
+    }
+
+    if (selector && !$el.is(selector)) {
+      continue
+    }
+
+    parents.push(elem)
+  }
+
+  return $jquery.wrap(parents)
 }
 
 const isSame = function ($el1, $el2) {
@@ -766,7 +786,7 @@ const getFirstDeepestElement = (elements, index = 0) => {
 
   // else once we find the first deepest element then return its priority
   // parent if it has one and it exists in the elements chain
-  const $priorities = elements.filter($current.parents(priorityElement))
+  const $priorities = elements.filter(getParents($current, priorityElement))
 
   if ($priorities.length) {
     return $priorities.last()
@@ -903,6 +923,8 @@ module.exports = {
   getElements,
 
   getParentOrShadowHost,
+
+  getParents,
 
   getFirstFocusableEl,
 

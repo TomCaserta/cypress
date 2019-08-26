@@ -202,7 +202,7 @@ module.exports = function (Commands, Cypress, cy, state, config) {
 
       const type = function () {
         const simulateSubmitHandler = function () {
-          const form = options.$el.parents('form')
+          const form = $elements.getParents(options.$el, 'form')
 
           if (!form.length) {
             return

@@ -203,7 +203,7 @@ const elDescendentsHavePositionFixedOrAbsolute = function ($parent, $child) {
   // create an array of all elements between $parent and $child
   // including child but excluding parent
   // and check if these have position fixed|absolute
-  const $els = $child.parentsUntil($parent).add($child)
+  const $els = $elements.getParents($child, null, $parent).add($child)
 
   return _.some($els.get(), (el) => {
     return fixedOrAbsoluteRe.test($jquery.wrap(el).css('position'))

@@ -3,10 +3,11 @@ $ = require("jquery")
 Promise = require("bluebird")
 
 $dom = require("../../../dom")
+$elements = require("../../../dom/elements")
 $utils = require("../../../cypress/utils")
 
 findScrollableParent = ($el, win) ->
-  $parent = $jquery.parent($el)
+  $parent = $dom.wrap($elements.getParent($el))
 
   ## if we're at the body, we just want to pass in
   ## window into jQuery scrollTo

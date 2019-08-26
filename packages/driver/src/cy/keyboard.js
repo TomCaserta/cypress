@@ -481,6 +481,7 @@ const create = (state) => {
 
       const event = new Event(eventType, {
         bubbles: true,
+        composed: true,
         cancelable: eventType !== 'input',
       })
 

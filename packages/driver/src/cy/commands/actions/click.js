@@ -270,6 +270,7 @@ module.exports = (Commands, Cypress, cy, state, config) => {
         const p = cy.now('focus', $el, { $el, error: false, verify: false, log: false }).then(() => {
           const event = new MouseEvent('dblclick', {
             bubbles: true,
+            composed: true,
             cancelable: true,
           })
 

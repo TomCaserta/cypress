@@ -11,6 +11,7 @@ const create = (state, keyboard) => {
 
       const mdownEvtProps = keyboard.mixinModifiers({
         bubbles: true,
+        composed: true,
         cancelable: true,
         view: win,
         clientX: fromViewport.x,
@@ -55,6 +56,7 @@ const create = (state, keyboard) => {
 
       const mupEvtProps = keyboard.mixinModifiers({
         bubbles: true,
+        composed: true,
         cancelable: true,
         view: win,
         clientX: fromViewport.x,
@@ -99,6 +101,7 @@ const create = (state, keyboard) => {
 
       const clickEvtProps = keyboard.mixinModifiers({
         bubbles: true,
+        composed: true,
         cancelable: true,
         view: win,
         clientX: fromViewport.x,

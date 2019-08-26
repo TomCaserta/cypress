@@ -197,6 +197,7 @@ module.exports = (Commands, Cypress, cy, state, config) ->
 
             input = new Event "input", {
               bubbles: true
+              composed: true
               cancelable: false
             }
 

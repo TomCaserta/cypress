@@ -50,6 +50,7 @@ create = (state) ->
     ## todo handle relatedTarget's per the spec
     focusoutEvt = new FocusEvent "focusout", {
       bubbles: true
+      composed: true
       cancelable: false
       view: win
       relatedTarget: null
@@ -122,6 +123,7 @@ create = (state) ->
     ## todo handle relatedTarget's per the spec
     focusinEvt = new FocusEvent "focusin", {
       bubbles: true
+      composed: true
       view: win
       relatedTarget: null
     }

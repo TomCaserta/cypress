@@ -613,7 +613,7 @@ const has = ($parent, $possibleChild) => {
 }
 
 const isDescendent = ($el1, $el2) => {
-  if (!$el1) {
+  if (!$el2) {
     return false
   }
 

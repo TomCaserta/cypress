@@ -599,12 +599,32 @@ const isScrollable = ($el) => {
   return false
 }
 
-const isDescendent = ($el1, $el2) => {
-  if (!$el2) {
+const has = ($parent, $possibleChild) => {
+  if (!$possibleChild) {
     return false
   }
 
-  return !!(($el1.get(0) === $el2.get(0)) || getParents($el1).index($el2) !== -1)
+  if (_.isString($possibleChild)) {
+    // TODO: Deeply select element and filter parents.
+    return false
+  }
+
+  return getParents($possibleChild).index($parent) !== -1
+}
+
+const isDescendent = ($el1, $el2) => {
+  if (!$el1) {
+    return false
+  }
+
+  const root = $el1.get(0).getRootNode()
+
+  // Check if the supposed 'child' is actually the host of the parent node
+  if (root && root.host && root.host === $el2.get(0)) {
+    return true
+  }
+
+  return !!(($el1.get(0) === $el2.get(0)) || has($el1, $el2))
 }
 
 const findParent = (el, fn) => {

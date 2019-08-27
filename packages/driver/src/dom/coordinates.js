@@ -1,7 +1,13 @@
 const $window = require('./window')
 
 const getElementAtPointFromViewport = (doc, x, y) => {
-  return doc.elementFromPoint(x, y)
+  const el = doc.elementFromPoint(x, y)
+
+  if (el.shadowRoot && doc !== el.shadowRoot) {
+    return getElementAtPointFromViewport(el.shadowRoot, x, y)
+  }
+
+  return el
 }
 
 const getElementPositioning = ($el) => {

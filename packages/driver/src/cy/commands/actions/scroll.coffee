@@ -7,7 +7,7 @@ $elements = require("../../../dom/elements")
 $utils = require("../../../cypress/utils")
 
 findScrollableParent = ($el, win) ->
-  $parent = $dom.wrap($elements.getParent($el))
+  $parent = $dom.wrap($elements.getParentOrShadowHost($el))
 
   ## if we're at the body, we just want to pass in
   ## window into jQuery scrollTo

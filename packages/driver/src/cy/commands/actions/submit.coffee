@@ -45,7 +45,7 @@ module.exports = (Commands, Cypress, cy, state, config) ->
       ## calling the native submit method will not actually trigger
       ## a submit event, so we need to dispatch this manually so
       ## native event listeners and jquery can bind to it
-      submit = new Event("submit", {bubbles: true, cancelable: true})
+      submit = new Event("submit", {bubbles: true, cancelable: true, composed: true })
       !!dispatched = form.dispatchEvent(submit)
 
       ## now we need to check to see if we should actually submit

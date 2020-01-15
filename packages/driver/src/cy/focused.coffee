@@ -84,7 +84,7 @@ create = (state) ->
 
     ## store the current focused element
     ## since when we call .focus() it will change
-    $focused = getFocused()
+    $focused = getFocused($dom.getDocumentFromElement(el))
 
     hasFocused = false
 
@@ -146,7 +146,7 @@ create = (state) ->
     ## events if the window is not in focus
     ## so we fire fake events to act as if the window
     ## is always in focus
-    $focused = getFocused()
+    $focused = getFocused($dom.getDocumentFromElement(el))
 
     if (!$focused || $focused[0] isnt el) && $elements.isW3CFocusable(el)
       fireFocus(el)
@@ -160,7 +160,7 @@ create = (state) ->
     ## events if the window is not in focus
     ## so we fire fake events to act as if the window
     ## is always in focus.
-    $focused = getFocused()
+    $focused = getFocused($dom.getDocumentFromElement(el))
 
     if $focused && $focused[0] is el
       fireBlur(el)
@@ -170,7 +170,7 @@ create = (state) ->
     return
 
   needsFocus = ($elToFocus, $previouslyFocusedEl) ->
-    $focused = getFocused()
+    $focused = getFocused($dom.getDocumentFromElement($elToFocus[0]))
 
     ## if we dont have a focused element
     ## we know we want to fire a focus event
@@ -194,8 +194,8 @@ create = (state) ->
 
     return false
 
-  getFocused = ->
-    { activeElement } = state("document")
+  getFocused = (doc = document) ->
+    activeElement = $dom.getActiveElement(doc)
 
     if $dom.isFocused(activeElement)
       return $dom.wrap(activeElement)

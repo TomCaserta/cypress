@@ -87,7 +87,6 @@ const create = (state, keyboard, focused) => {
         // https://developer.mozilla.org/en-US/docs/Web/API/Event/composed
         composed: true,
         bubbles: true,
-        composed: true,
         // only for events involving moving cursor
         relatedTarget: null,
       }, modifiersEventOptions, coordsEventOptions)
@@ -269,7 +268,7 @@ const create = (state, keyboard, focused) => {
      * @returns {HTMLElement}
      */
     getElAtCoords ({ x, y, doc }) {
-      const el = doc.elementFromPoint(x, y)
+      const el = $dom.getElementAtPointFromViewport(doc, x, y)
 
       return el
     },
@@ -350,12 +349,11 @@ const create = (state, keyboard, focused) => {
     },
 
     down (fromElViewport, forceEl, pointerEvtOptionsExtend = {}, mouseEvtOptionsExtend = {}) {
-      const $previouslyFocused = focused.getFocused()
-
       const mouseDownPhase = mouse._downEvents(fromElViewport, forceEl, pointerEvtOptionsExtend, mouseEvtOptionsExtend)
 
       // el we just send pointerdown
       const el = mouseDownPhase.targetEl
+      const $previouslyFocused = focused.getFocused($dom.getDocumentFromElement(el))
 
       if (mouseDownPhase.events.pointerdown.preventedDefault || mouseDownPhase.events.mousedown.preventedDefault || !$elements.isAttachedEl(el)) {
         return mouseDownPhase
@@ -369,7 +367,7 @@ const create = (state, keyboard, focused) => {
           // if the first focusable element from the click
           // is the window, then we can skip the focus event
           // since the user has clicked a non-focusable element
-          const $focused = focused.getFocused()
+          const $focused = focused.getFocused($dom.getDocumentFromElement($elToFocus[0]))
 
           if ($focused) {
             focused.fireBlur($focused.get(0))

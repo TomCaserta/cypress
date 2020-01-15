@@ -403,7 +403,11 @@ const activeElementIsDefault = (activeElement, body) => {
   return !activeElement || activeElement === body
 }
 
-const isFocused = (el) => {
+const isFocused = (el: HTMLElement | null) => {
+  if (!el) {
+    return false
+  }
+
   try {
     const doc = $document.getDocumentFromElement(el)
 
@@ -413,7 +417,7 @@ const isFocused = (el) => {
       return false
     }
 
-    return doc.activeElement === el
+    return getActiveElement(doc) === el
   } catch (err) {
     return false
   }
@@ -714,6 +718,17 @@ export interface HTMLElementCanSetSelectionRange extends HTMLElement {
 export type HTMLTextLikeElement = HTMLTextAreaElement | HTMLTextLikeInputElement | HTMLContentEditableElement
 
 const isTextLike = function (el: HTMLElement): el is HTMLTextLikeElement {
+  const isContentEditableElement = isContentEditable(el)
+
+  // TODO: Improve text like support with Web Components
+  // Assume Web Components are always text like until
+  // a better alternative is found
+  const isShadowElement = el && el.shadowRoot !== null
+
+  if (isShadowElement || isContentEditableElement) {
+    return true
+  }
+
   const $el = $jquery.wrap(el)
   const sel = (selector) => {
     return isSelector($el, selector)
@@ -726,12 +741,7 @@ const isTextLike = function (el: HTMLElement): el is HTMLTextLikeElement {
     return false
   }
 
-  const isContentEditableElement = isContentEditable(el)
-
-  if (isContentEditableElement) return true
-
   return _.some([
-    isContentEditableElement,
     sel('textarea'),
     sel(':text'),
     type('text'),
@@ -892,8 +902,24 @@ const getFirstFocusableEl = ($el: JQuery<HTMLElement>) => {
 
   return getFirstFocusableEl($jquery.wrap(getParentOrShadowHost($el)))
 }
+
+const getActiveElement = (element: Document | ShadowRoot) => {
+  // If element is a document node.
+  const activeElement = element.nodeType === 9 ? getNativeProp(element, 'activeElement') : element.activeElement
+
+  if (activeElement && activeElement.shadowRoot) {
+    return getActiveElement(activeElement.shadowRoot)
+  }
+
+  return activeElement
+}
+
 const getActiveElByDocument = (doc: Document): HTMLElement | null => {
-  const activeElement = getNativeProp(doc, 'activeElement')
+  if (!doc) {
+    return null
+  }
+
+  const activeElement = getActiveElement(doc)
 
   if (isFocused(activeElement)) {
     return activeElement as HTMLElement
@@ -1166,6 +1192,7 @@ export {
   getParentOrShadowHost,
   getParents,
   getFirstFocusableEl,
+  getActiveElement,
   getActiveElByDocument,
   getContainsSelector,
   getFirstDeepestElement,

@@ -4,7 +4,7 @@
   "private": true,
   "main": "index.js",
   "scripts": {
-    "build-js": "bin-up tsc --project .",
+    "build-js": "../../node_modules/.bin/tsc --project .",
     "clean-deps": "rm -rf node_modules",
     "test": "bin-up mocha --reporter mocha-multi-reporters --reporter-options configFile=../../mocha-reporter-config.json"
   },
